@@ -1,0 +1,44 @@
+{
+    "name": "attla/authentic",
+    "description": "An effective serverless user authentication layer.",
+    "keywords": [
+        "attla",
+        "laravel",
+        "authentic",
+        "authentication",
+        "user-authentication",
+        "serverless",
+        "serverless-authentication",
+        "cookier-authentication"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lucas Nicolau",
+            "email": "lucas@octha.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "attla/cookier": "dev-main",
+        "attla/data-token": "dev-main",
+        "illuminate/auth": "^6|^7|^8|^9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Attla\\Authentic\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "aliases": {
+                "Authentic": "Attla\\Authentic\\Facade"
+            },
+            "providers": [
+                "Attla\\Authentic\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
