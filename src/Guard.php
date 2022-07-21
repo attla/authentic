@@ -113,7 +113,7 @@ class Guard implements StatefulGuard
 
         if (
             is_object(
-                $data = Cookier::get('sign')
+                $data = Cookier::get($this->getName())
                     ?: DataToken::decode($this->getRequest()?->bearerToken())
             )
         ) {
@@ -280,7 +280,7 @@ class Guard implements StatefulGuard
      */
     protected function hasValidCredentials($user, $credentials)
     {
-        $validated = ! is_null($user) && $this->provider->validateCredentials($user, $credentials);
+        $validated = !is_null($user) && $this->provider->validateCredentials($user, $credentials);
 
         if ($validated) {
             $this->fireValidatedEvent($user);
@@ -347,8 +347,13 @@ class Guard implements StatefulGuard
      */
     protected function storeUser(Authenticatable $user, $remember = false)
     {
-        $expiration = $remember ? $this->rememberDuration : 30;
-        Cookier::get('sign', DataToken::payload($user)->sign($expiration), $expiration);
+        Cookier::set(
+            $this->getName(),
+            DataToken::payload($user)
+                ->sign($expiration = $remember ? $this->rememberDuration : 30)
+                ->encode(),
+            $expiration
+        );
     }
 
 
@@ -373,7 +378,7 @@ class Guard implements StatefulGuard
      */
     public function clearUserDataFromStorage()
     {
-        Cookier::forget('sign');
+        Cookier::forget($this->getName());
     }
 
     /**
@@ -565,10 +570,20 @@ class Guard implements StatefulGuard
     {
         if (!$provider instanceof EloquentUserProvider) {
             throw new \InvalidArgumentException(
-                'Authentication user provider is not accepted. Authentic only accepts EloquentUserProvider instance.'
+                'Authentication user provider is not accepted. '
+                . 'Authentic only accepts EloquentUserProvider instance.'
             );
         }
 
         $this->provider = $provider;
+    }
+
+    /**
+     * Determine if the user was authenticated via "remember me" cookie
+     *
+     * @return bool
+     */
+    public function viaRemember()
+    {
     }
 }
