@@ -14,13 +14,35 @@
 composer require attla/authentic
 ```
 
-## Usage
+## Configuration
+
+In `./config/auth.php` on `guards` add the following array:
 
 ```php
 
-// WIP
+'guards' => [
+    // ...
+
+    'authentic' => [
+        'driver'   => 'authentic',
+        'provider' => 'users',
+    ],
+],
 
 ```
+
+If you want to configure the authentic as your default authentication guard set on `defaults.guard` as:
+
+```php
+
+'defaults' => [
+    'guard' => 'authentic',
+    // ...
+],
+
+```
+
+NOTE: This package needs to be used with eloquent provider driver.
 
 ## License
 
