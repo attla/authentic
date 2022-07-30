@@ -26,12 +26,10 @@ use Illuminate\Contracts\{
     Auth\StatefulGuard,
     Auth\UserProvider,
     Events\Dispatcher,
-    Support\Arrayable,
-    Support\Jsonable,
 };
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\{
     Arr,
-    Enumerable,
     Traits\Macroable,
 };
 use Symfony\Component\HttpFoundation\Request;
