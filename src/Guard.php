@@ -117,7 +117,6 @@ class Guard implements StatefulGuard
             )
         ) {
             $user = $this->createModel($data);
-            $user->exists = true;
         }
 
         return $this->user = $user;
@@ -132,8 +131,12 @@ class Guard implements StatefulGuard
     protected function createModel(object $attributes)
     {
         $class = '\\' . ltrim($this->provider->getModel(), '\\');
+        $model = new $class();
+        if ($model instanceof Model) {
+            $model = $model->newFromBuilder(AttlaArr::toArray($attributes));
+        }
 
-        return new $class(AttlaArr::toArray($attributes));
+        return $model;
     }
 
     /**
