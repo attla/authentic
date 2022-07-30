@@ -42,6 +42,33 @@ If you want to configure the authentic as your default authentication guard set 
 
 ```
 
+Your model needs extends `Authenticatable`, as:
+
+```php
+
+class Example extends Authenticatable
+{
+    // ...
+}
+
+```
+
+For prevents errors your needs to rewrite the `setRememberToken()` method as:
+
+```php
+
+class Example extends Authenticatable
+{
+    // ...
+    public function setRememberToken($value)
+    {
+    }
+}
+
+```
+
+NOTE: Don't do anything on `setRememberToken()` its needs be empty
+
 NOTE: This package needs to be used with eloquent provider driver.
 
 ## License
