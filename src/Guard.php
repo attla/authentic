@@ -128,7 +128,7 @@ class Guard implements StatefulGuard
      * @param object $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function createModel(object $attributes)
+    public function createModel(object $attributes)
     {
         $class = '\\' . ltrim($this->provider->getModel(), '\\');
         $model = new $class();
