@@ -1,4 +1,4 @@
-# Authentic user authentication layer
+# Authentic stateless user layer
 
 <p align="center">
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgrey.svg" alt="License"></a>
