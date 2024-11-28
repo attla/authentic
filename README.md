@@ -6,7 +6,7 @@
 <a href="https://packagist.org/packages/attla/authentic"><img src="https://img.shields.io/packagist/dt/attla/authentic" alt="Total Downloads"></a>
 </p>
 
-🆔 An effective serverless user authentication layer.
+🆔 An effective serverless user authentication and authorization layer.
 
 ## Installation
 
@@ -19,7 +19,6 @@ composer require attla/authentic
 In `./config/auth.php` on `guards` add the following array:
 
 ```php
-
 'guards' => [
     // ...
 
@@ -28,33 +27,44 @@ In `./config/auth.php` on `guards` add the following array:
         'provider' => 'users',
     ],
 ],
-
 ```
-
-> This package needs to be used with eloquent provider driver.
 
 If you want to configure the authentic as your default authentication guard set on `defaults.guard` as:
 
 ```php
-
 'defaults' => [
     'guard' => 'authentic',
     // ...
 ],
-
 ```
 
-Your model needs extends `Authenticatable`, as:
+Your model needs implements `Authenticatable` contract:
 
 ```php
+use Illuminate\Contracts\Auth\Authenticatable;
 
-class Example extends Authenticatable
+class Example implements Authenticatable
 {
     // ...
 }
+```
 
+## Providers
+
+Also in `./config/auth.php` on `guards` add the following array:
+
+```php
+'providers' => [
+    // ...
+
+    'dynamodb' => [
+        'driver' => 'dynamodb',
+        'model'  => Model::class,
+        // 'gsi'    => '',
+    ],
+],
 ```
 
 ## License
 
-This package is licensed under the [MIT license](LICENSE) © [Octha](https://octha.com).
+This package is licensed under the [MIT license](LICENSE) © [Zunq](https://zunq.com).
