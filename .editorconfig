@@ -1,21 +1,18 @@
 root = true
 
 [*]
-end_of_line = lf
 charset = utf-8
-trim_trailing_whitespace = true
-insert_final_newline = true
-
-[*.blade.php]
-insert_final_newline = false
-
-[{*.php,composer.json,*.md}]
-indent_style = space
+end_of_line = lf
 indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
 
 [*.md]
 trim_trailing_whitespace = false
 
-[*.yml]
-indent_style = space
+[*.{yml,yaml}]
 indent_size = 2
+
+[docker-compose.yml]
+indent_size = 4
