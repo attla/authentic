@@ -106,7 +106,7 @@ class AuthzRepository
      */
     protected function formatAbility($ability)
     {
-        $ability = $this->formatName($ability);
+        $ability = Ability::format($ability);
         if (strpos($ability, '.') === false) {
             return [$ability, null];
         }
@@ -117,17 +117,6 @@ class AuthzRepository
             substr($ability, 0, $lastDotPos),
             substr($ability, $lastDotPos + 1),
         ];
-    }
-
-    /**
-     * Format the ability identifier
-     *
-     * @param string $ability
-     * @return string
-     */
-    protected function formatName($ability)
-    {
-        return Str::snake(strtr($ability, '-:', '_.'));
     }
 
     /**

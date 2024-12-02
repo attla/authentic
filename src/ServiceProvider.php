@@ -19,9 +19,19 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         'unauthorized' => Unauthorized::class,
     ];
 
+    /**
+     * List of registrable commands
+     *
+     * @var array
+     */
+    protected $commands = [
+        Commands\CacheAbilities::class,
+    ];
+
     /** {@inheritdoc} */
     public function register()
     {
+        $this->commands($this->commands);
     }
 
     /** {@inheritdoc} */

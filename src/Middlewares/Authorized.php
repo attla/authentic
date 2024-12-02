@@ -2,10 +2,9 @@
 
 namespace Attla\Authentic\Middlewares;
 
+use Attla\Authentic\Ability;
 use Core\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class Authorized
 {
@@ -19,7 +18,7 @@ class Authorized
     public function handle(Request $request, \Closure $next)
     {
         $unauthorized = Response::unauthorized();
-        $ability = $this->getAbility($request);
+        $ability = Ability::fromRoute($request->route());
 
         if (empty($ability) || is_null($user = $request->user())) {
             return $unauthorized;
@@ -40,41 +39,5 @@ class Authorized
         }
 
         return $next($request);
-    }
-
-    /**
-     * Retrieve the ability from current incoming request
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return string
-     */
-    protected function getAbility(Request $request)
-    {
-        $route = $request->route();
-        if ($ability = $route->getName()) {
-            return $ability;
-        }
-
-        $action = explode('@', $route->getActionName());
-
-        if (count($action) == 2) {
-            $method = $action[1];
-            $parts = array_filter(array_map(function($item) {
-                $part = array_filter(explode('controller', $item));
-                return count($part) < 2 ? $part[0] ?? '' : $part;
-            }, explode('\\', strtolower($action[0]))));
-
-            do {
-                $feature = array_pop($parts);
-                if (is_array($feature)) {
-                    $feature = Arr::first($feature);
-                }
-            } while (empty($feature));
-
-            $feature = Str::plural($feature);
-            return "$feature.$method";
-        }
-
-        return '';
     }
 }
