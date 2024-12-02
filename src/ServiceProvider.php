@@ -2,6 +2,10 @@
 
 namespace Attla\Authentic;
 
+use Attla\Authentic\Middlewares\Authorized;
+use Attla\Authentic\Middlewares\Unauthorized;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
     /**
@@ -10,8 +14,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      * @var array
      */
     protected $middlewareAliases = [
-        // 'authn' => AuthnMiddleware::class,
-        // 'authz' => AuthzMiddleware::class,
+        'authz'        => Authorized::class,
+        'authorized'   => Authorized::class,
+        'unauthorized' => Unauthorized::class,
     ];
 
     /** {@inheritdoc} */
@@ -27,9 +32,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         // $this->publishes([$path => config_path('authentic.php')], 'config');
         // $this->mergeConfigFrom($path, 'authentic');
 
-        // $this->aliasMiddleware();
+        $this->aliasMiddleware();
 
         $this->registerDynamodbProvider();
+        $this->registerGate();
         $this->extendAuthGuard();
     }
 
@@ -66,6 +72,18 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 $config['model'],
                 $config['gsi'] ?? null,
             );
+        });
+    }
+
+    /**
+     * Register permissions gate
+     *
+     * @return void
+     */
+    protected function registerGate()
+    {
+        $this->app->singleton(GateContract::class, function ($app) {
+            return new Gate($app['auth']->userResolver());
         });
     }
 

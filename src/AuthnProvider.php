@@ -4,7 +4,6 @@ namespace Attla\Authentic;
 
 use Attla\Support\Arr as AttlaArr;
 use Illuminate\Contracts\Auth\Authenticatable;
-
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Support\Arr;

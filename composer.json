@@ -26,6 +26,7 @@
     "require": {
         "php": ">=7.2.5",
         "attla/cookier": "dev-main",
+        "attla/core-design": "dev-main",
         "attla/token": "dev-main",
         "attla/support": "dev-main",
         "illuminate/auth": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
