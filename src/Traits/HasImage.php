@@ -40,10 +40,10 @@ trait HasImage
         if (in_array($default, ['bottts-neutral', 'shapes', 'thumbs'])) {
             $default = $this->dicebear($token, $default);
         } else if ($default == 'multiavatar') {
-            $default = 'https://api.multiavatar.com/' . $token . '.png';
+            $default = "https://api.multiavatar.com/{$token}.png";
         }
 
-        return 'https://s.gravatar.com/avatar/' . $token . '?size=' . $size . '&d=' . $default;
+        return "https://s.gravatar.com/avatar/{$token}?size={$size}&d=" . $default;
     }
 
     /**
