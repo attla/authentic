@@ -31,16 +31,17 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     /** {@inheritdoc} */
     public function register()
     {
-        $this->commands($this->commands);
+        if ($this->app->runningInConsole()) {
+            $this->commands($this->commands);
+        }
     }
 
     /** {@inheritdoc} */
     public function boot()
     {
-        // $path = realpath(__DIR__.'/../../config/config.php');
-
-        // $this->publishes([$path => config_path('authentic.php')], 'config');
-        // $this->mergeConfigFrom($path, 'authentic');
+        if ($this->app->runningInConsole()) {
+            return;
+        }
 
         $this->aliasMiddleware();
 
