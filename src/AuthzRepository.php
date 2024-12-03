@@ -59,7 +59,7 @@ class AuthzRepository
 
             if (
                 is_null($group)
-                || $action !== '*' && !in_array($action, $group)
+                || $action !== '*' && !in_array('*', $group) && !in_array($action, $group)
             ) {
                 return false;
             }
