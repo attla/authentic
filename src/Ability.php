@@ -12,7 +12,6 @@ class Ability extends ListBag
     /** @inheritdoc */
     public function __construct(object|array $data = [])
     {
-        // $this->cache = Cache::store('file');
         $this->data = array_map(
             fn($val) => $this->format($val),
             array_values(Arr::toArray($data))
@@ -63,7 +62,7 @@ class Ability extends ListBag
      */
     public static function cached()
     {
-        if (file_exists($path = static::cachePath())) {
+        if (is_file($path = static::cachePath())) {
             return include_once $path;
         }
 
