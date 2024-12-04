@@ -5,13 +5,6 @@ namespace Attla\Authentic\Traits;
 trait HasImage
 {
     /**
-     * Default user image
-     *
-     * @return string
-     */
-    protected $defaultImage = 'bottts-neutral';
-
-    /**
      * Get user image
      *
      * @return string
@@ -22,7 +15,7 @@ trait HasImage
             return $this->social_image;
         }
 
-        return $this->gravatar($this->email, 150, $this->defaultImage ?? 'bottts-neutral');
+        return $this->gravatar($this->email, 150, $this->defaultImage());
     }
 
     /**
@@ -56,5 +49,20 @@ trait HasImage
     public function dicebear($seed, $style = 'bots')
     {
         return "https://api.dicebear.com/9.x/{$style}/svg?seed=" . $seed;
+    }
+
+    /**
+     * Get default user image
+     *
+     * @return string
+     */
+    public function defaultImage()
+    {
+        $default = 'bottts-neutral';
+        if (isset($this->defaultImage)) {
+            return $this->defaultImage ?: $default;
+        }
+
+        return $default;
     }
 }
