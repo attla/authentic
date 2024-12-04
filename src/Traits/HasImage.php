@@ -27,7 +27,7 @@ trait HasImage
             return $this->social_image;
         }
 
-        return $this->gravatar($this->email, 150, $this->defaultImage());
+        return $this->gravatar($this->email, 150, $this->getDefaultImage());
     }
 
     /**
@@ -68,7 +68,7 @@ trait HasImage
      *
      * @return string
      */
-    public function defaultImage()
+    public function getDefaultImage()
     {
         $default = 'bottts-neutral';
         if (isset($this->defaultImage)) {
