@@ -5,6 +5,18 @@ namespace Attla\Authentic\Traits;
 trait HasImage
 {
     /**
+     * Boot trait
+     *
+     * @return void
+     */
+    public static function bootHasImage()
+    {
+        static::building(function ($model) {
+            $model->appends[] = 'image';
+        });
+    }
+
+    /**
      * Get user image
      *
      * @return string
