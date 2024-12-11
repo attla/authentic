@@ -42,7 +42,9 @@ trait HasImage
     {
         $token = md5(strtolower(trim($email)));
 
-        if (in_array($default, ['bottts-neutral', 'shapes', 'thumbs'])) {
+        if (in_array($default, ['initials', 'initial', 'letters', 'letter'])) {
+            $default = $this->initials($token);
+        } else if (in_array($default, ['bottts-neutral', 'shapes', 'thumbs'])) {
             $default = $this->dicebear($token, $default);
         } else if ($default == 'multiavatar') {
             $default = "https://api.multiavatar.com/{$token}.png";
@@ -61,6 +63,18 @@ trait HasImage
     public function dicebear($seed, $style = 'bots')
     {
         return "https://api.dicebear.com/9.x/{$style}/svg?seed=" . $seed;
+    }
+
+    /**
+     * Get initials image
+     *
+     * @param string $seed
+     * @return string
+     */
+    public function initials($seed)
+    {
+        return "https://api.dicebear.com/7.x/initials/svg?backgroundType=gradientLinear"
+             . "&fontFamily=Helvetica&fontSize=40&seed=" . $seed;
     }
 
     /**
