@@ -4,8 +4,10 @@ namespace Attla\Authentic;
 
 use Attla\Token\Factory;
 use Attla\Cookier\Facade as Cookier;
+use Attla\Support\Envir;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Support\Str;
 
 class Token
 {
@@ -115,7 +117,7 @@ class Token
         return Factory::parse($token)
             // ->ip()
             // ->browser()
-            ->issuedBy(static::$request->getHttpHost())
+            ->issuedBy(static::host(Envir::getConfig('authentic.flow.server')) ?: static::$request->getHttpHost())
             ->permittedFor(static::$request->getHttpHost())
             ->associative();
     }
@@ -170,5 +172,27 @@ class Token
     public static function setRequest(Request $request)
     {
         static::$request = $request;
+    }
+
+
+    /**
+     * Format a host
+     *
+     * @param string $url
+     * @return string
+     */
+    public static function host($url)
+    {
+        if (!$url) {
+            return '';
+        }
+
+        $url = (string) $url;
+        if (!Str::startsWith($url, 'http')) {
+            $url = 'http://' . $url;
+        }
+
+        $port = parse_url($url, PHP_URL_PORT);
+        return parse_url($url, PHP_URL_HOST) . ($port ? ':' . $port : '');
     }
 }
