@@ -27,7 +27,17 @@ trait HasImage
             return $this->social_image;
         }
 
-        return $this->gravatar($this->email, 150, $this->getDefaultImage());
+        return $this->gravatar($this->image_hash, 150, $this->getDefaultImage());
+    }
+
+    /**
+     * Get user image
+     *
+     * @return string
+     */
+    public function getImageHashAttribute()
+    {
+        return md5(strtolower(trim($this->email)));
     }
 
     /**
@@ -38,19 +48,17 @@ trait HasImage
      * @param string $default
      * @return string
      */
-    public function gravatar($email, $size, $default = 'identicon')
+    public function gravatar($seed, $size, $default = 'identicon')
     {
-        $token = md5(strtolower(trim($email)));
-
         if (in_array($default, ['initials', 'initial', 'letters', 'letter'])) {
-            $default = $this->initials($token);
+            $default = $this->initials($seed);
         } else if (in_array($default, ['bottts-neutral', 'shapes', 'thumbs'])) {
-            $default = $this->dicebear($token, $default);
+            $default = $this->dicebear($seed, $default);
         } else if ($default == 'multiavatar') {
-            $default = "https://api.multiavatar.com/{$token}.png";
+            $default = "https://api.multiavatar.com/{$seed}.png";
         }
 
-        return "https://s.gravatar.com/avatar/{$token}?size={$size}&d=" . $default;
+        return "https://s.gravatar.com/avatar/{$seed}?size={$size}&d=" . $default;
     }
 
     /**
