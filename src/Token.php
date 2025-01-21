@@ -131,6 +131,7 @@ class Token
     {
         return Factory::create()
             ->issuedBy(static::$request->getHttpHost())
+            ->permittedFor(static::$request->getHttpHost())
             ->issuedAt($time = time())
             ->expiresAt($time + $expiration)
             // ->ip()
