@@ -40,11 +40,11 @@ class AuthnGuard implements Contracts\StatelessGuard
     protected $viaRemember = false;
 
     /**
-     * The number of minutes that the "remember me" cookie should be valid for
+     * The number of secounds that the "remember me" cookie should be valid for
      *
      * @var int
      */
-    protected $rememberDuration = 2628000;
+    protected $rememberDuration = 7200;
 
     /**
      * The request instance
@@ -52,13 +52,6 @@ class AuthnGuard implements Contracts\StatelessGuard
      * @var \Illuminate\Http\Request
      */
     protected $request;
-
-    /**
-     * The token request parser instance
-     *
-     * @var Parser
-     */
-    protected $parser;
 
     /**
      * Create a new authentication guard
@@ -71,9 +64,7 @@ class AuthnGuard implements Contracts\StatelessGuard
     public function __construct($name, UserProvider $provider, Request $request)
     {
         $this->name = $name;
-        $this->provider = $provider;
-        $this->request = $request;
-        $this->parser = new Parser($request);
+        $this->setProvider($provider)->setRequest($request);
     }
 
     /**
@@ -87,7 +78,7 @@ class AuthnGuard implements Contracts\StatelessGuard
             return $this->user;
         }
 
-        $token = $this->parser->parse();
+        $token = Token::parse(Token::fromRequest());
 
         return $this->user = $token->isValid() ? $this->provider->createModel($token->get()) : null;
     }
@@ -270,9 +261,7 @@ class AuthnGuard implements Contracts\StatelessGuard
         $this->fireLoginEvent($user, $remember);
         $this->setUser($user);
 
-        return (new StatelessToken([
-            'access' => $this->parser->create($user)->get(),
-        ]));
+        return StatelessToken::fromUser($user, $this->rememberDuration);
     }
 
     /**
@@ -343,7 +332,7 @@ class AuthnGuard implements Contracts\StatelessGuard
     public function setRequest(Request $request)
     {
         $this->request = $request;
-        $this->parser->setRequest($request);
+        Token::setRequest($request);
         return $this;
     }
 

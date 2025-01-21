@@ -2,12 +2,33 @@
 
 namespace Attla\Authentic;
 
+use Attla\Authentic\Middlewares\AllowServer;
+use Attla\Support\Envir;
 use Attla\Authentic\Middlewares\Authorized;
+use Attla\Authentic\Middlewares\MultipleAuth;
 use Attla\Authentic\Middlewares\Unauthorized;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Support\Str;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
+    /**
+     * Package name
+     *
+     * @var string
+     */
+    private const NAME = 'authentic';
+
+    /**
+     * The middlewares
+     *
+     * @var array
+     */
+    protected $middlewares = [
+        MultipleAuth::class,
+    ];
+
     /**
      * The middleware aliases
      *
@@ -31,6 +52,8 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     /** {@inheritdoc} */
     public function register()
     {
+        $this->mergeConfigFrom($this->configPath(), static::NAME);
+
         if ($this->app->runningInConsole()) {
             $this->commands($this->commands);
         }
@@ -40,10 +63,15 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                $this->configPath() => $this->app->configPath(static::NAME . '.php'),
+            ], 'config');
+
             return;
         }
 
-        $this->aliasMiddleware();
+        $this->registerMiddlewares();
+        $this->registerRoutes();
 
         $this->registerDynamodbProvider();
         $this->registerGate();
@@ -66,7 +94,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             $app->refresh('request', $guard, 'setRequest');
 
             return $guard->setDispatcher($app['events'])
-                ->setRememberDuration($config['remember'] ?? 0);
+                ->setRememberDuration(Envir::getConfig(
+                    static::NAME. '.flow.remember',
+                    $config['remember'] ?? 0) * 60
+                );
         });
     }
 
@@ -111,6 +142,86 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         foreach ($this->middlewareAliases as $alias => $middleware) {
             $router->$method($alias, $middleware);
         }
+    }
+
+    /**
+     * Register middlewares
+     *
+     * @return void
+     */
+    protected function registerMiddlewares()
+    {
+        $this->aliasMiddleware();
+        $kernel = $this->app->make(Kernel::class);
+
+        foreach ($this->middlewares as $middleware) {
+            $kernel->pushMiddleware($middleware);
+        }
+    }
+
+    /**
+     * Register flow routes
+     *
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        $router = $this->app['router'];
+        $prefix = static::NAME. '.flow.';
+        $router->group(Envir::getConfig($prefix. 'route-group', [
+            'as'         => 'authentic.',
+            'namespace'  => 'Attla\\Authentic\\Controllers',
+            'controller' => 'FlowController',
+        ]), function () use ($router, $prefix) {
+            $route = Envir::getConfig($prefix. 'route') ?: 'sign';
+            $middlewares = array_merge([AllowServer::class], Envir::getConfig($prefix. 'middlewares') ?: []);
+
+            $this->registerRoute(
+                $router,
+                $route,
+                $route,
+                $middlewares,
+                $route,
+                'post'
+            );
+        });
+
+    }
+
+    /**
+     * Register route
+     *
+     * @param \Illuminate\Contracts\Routing\Registrar $router
+     * @param string $name
+     * @param string $path
+     * @param array $middlewares
+     * @param string $action
+     * @param string $method
+     *
+     * @return void
+     */
+    protected function registerRoute(
+        $router,
+        $name,
+        $path,
+        array $middlewares = [],
+        $action = null,
+        string $method = 'get'
+    ) {
+        $router->{$method}('/' . trim(trim($path), '/?'), [
+            'uses' => trim(Str::camel($action ?: $name), '/?=_-'),
+            'as' => trim($name, '/?=_-'),
+        ])->middleware($middlewares[$name] ?? []);
+    }
+
+    /**
+     * Get config path
+     *
+     * @return string
+     */
+    protected function configPath()
+    {
+        return __DIR__ . '/../config/' . static::NAME . '.php';
     }
 
     /**
